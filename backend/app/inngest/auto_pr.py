@@ -1,3 +1,4 @@
+import asyncio
 import json
 
 import inngest
@@ -71,8 +72,7 @@ async def handle_auto_pr(ctx: inngest.Context):
     if isinstance(plan, str):
         plan = json.loads(plan)
 
-    changes = []
-    for file_plan in plan["files"]:
+    async def _generate_change(file_plan):
         file_path = file_plan["path"]
         action = file_plan["action"]
         description = file_plan["description"]
@@ -96,14 +96,15 @@ async def handle_auto_pr(ctx: inngest.Context):
             custom_rules=custom_rules,
         )
 
-        changes.append(
-            {
-                "path": file_path,
-                "action": action,
-                "content": new_content,
-                "sha": file_shas.get(file_path),
-            }
-        )
+        return {
+            "path": file_path,
+            "action": action,
+            "content": new_content,
+            "sha": file_shas.get(file_path),
+        }
+
+    # Generate all file changes in parallel instead of sequentially
+    changes = await asyncio.gather(*[_generate_change(fp) for fp in plan["files"]])
 
     branch_name = f"bughop/issue-{issue_number}"
 

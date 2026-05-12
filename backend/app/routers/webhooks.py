@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 
 from app.handlers.installation import handle_installation
-from app.handlers.issue import handle_issue
+from app.handlers.issue import handle_issue, handle_issue_labeled
 from app.handlers.pull_request import handle_pull_request
 from app.models.schemas import WebhookPayload, WebhookResponse
 
@@ -18,6 +18,10 @@ async def handle_webhook(data: WebhookPayload):
     elif event == "pull_request":
         await handle_pull_request(payload)
     elif event == "issues":
-        await handle_issue(payload)
+        action = payload.get("action")
+        if action == "opened":
+            await handle_issue(payload)
+        elif action == "labeled":
+            await handle_issue_labeled(payload)
 
     return WebhookResponse(status="success")

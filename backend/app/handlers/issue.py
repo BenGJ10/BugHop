@@ -6,6 +6,7 @@ from app.services.frontend import fetch_custom_rules, log_issue_analysis
 
 
 async def handle_issue(payload):
+    """Handles 'opened' action: posts an AI analysis comment on the issue."""
     installation_id = str(payload["installation"]["id"])
     issue = payload["issue"]
     repo = payload["repository"]
@@ -55,4 +56,32 @@ async def handle_issue(payload):
     issue_github_id = issue.get("id", 0)
     await log_issue_analysis(
         f"{owner}/{repo_name}", issue_number, title, issue_github_id
+    )
+
+
+async def handle_issue_labeled(payload):
+    """Fires the auto-PR Inngest job when the 'bughop:fix' label is added to an issue."""
+    label = payload.get("label", {})
+    if label.get("name", "").lower() != "bughop:fix":
+        # Label added is not 'bughop:fix', ignore it
+        return
+
+    installation_id = str(payload["installation"]["id"])
+    issue = payload["issue"]
+    repo = payload["repository"]
+    owner = repo["owner"]["login"]
+    repo_name = repo["name"]
+
+    await inngest_client.send(
+        inngest.Event(
+            name="issue/auto-pr",
+            data={
+                "installation_id": installation_id,
+                "owner": owner,
+                "repo_name": repo_name,
+                "issue_number": issue["number"],
+                "issue_title": issue["title"],
+                "issue_body": issue.get("body", "") or "",
+            },
+        )
     )
