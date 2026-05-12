@@ -16,7 +16,7 @@ export async function findRepoWithInstallation(repoFullName: string) {
 }
 
 export async function upsertRepository(
-  githubId: number,
+  githubId: bigint | number,
   name: string,
   fullName: string,
   installationId: string,

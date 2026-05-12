@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
 			if (installation) {
 				const fallbackName = repoFullName.split("/")[1] || repoFullName;
 				await upsertRepository(
-					Number(repoGithubId),
+					BigInt(repoGithubId),
 					repoName || fallbackName,
 					repoFullName,
 					installation.id,

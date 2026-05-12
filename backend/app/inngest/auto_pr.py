@@ -31,19 +31,24 @@ async def handle_auto_pr(ctx: inngest.Context):
         query_embedding, limit=10, repo=repo_full_name
     )
 
+    seen_chunks = set()
     for point in search_results:
         payload = point.payload
         path = payload.get("path", "")
+        name = payload.get("name", "")
+        chunk_id = f"{path}::{name}"
+
         if path:
             file_paths.add(path)
-            content = payload.get("content", "")
-            name = payload.get("name", "")
-            chunk_type = payload.get("chunk_type", "code")
-            header = f"File: {path}"
-            if name:
-                header += f" | {chunk_type}: {name}"
+            if chunk_id not in seen_chunks:
+                content = payload.get("content", "")
+                chunk_type = payload.get("chunk_type", "code")
+                header = f"File: {path}"
+                if name:
+                    header += f" | {chunk_type}: {name}"
 
-            related_code += f"\n-- {header} ---\n{content}\n"
+                related_code += f"\n-- {header} ---\n{content}\n"
+                seen_chunks.add(chunk_id)
 
     file_contents = {}
     file_shas = {}

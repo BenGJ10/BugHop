@@ -19,17 +19,20 @@ async def handle_issue(payload):
 
     repo_full_name = f"{owner}/{repo_name}"
     related_code = ""
-    seen_paths = set()
+    seen_chunks = set()
 
-    title_embedding = await embeddings.create_embedding(title)
-    title_results = await vectordb.search(title_embedding, limit=5, repo=repo_full_name)
+    query = f"{title}\n{description}"
+    query_embedding = await embeddings.create_embedding(query[:8000])
+    search_results = await vectordb.search(query_embedding, limit=10, repo=repo_full_name)
 
-    for point in title_results:
+    for point in search_results:
         payload_data = point.payload
         path = payload_data.get("path", "")
-        if path and path not in seen_paths:
+        name = payload_data.get("name", "")
+        chunk_id = f"{path}::{name}"
+
+        if path and chunk_id not in seen_chunks:
             content = payload_data.get("content", "")
-            name = payload_data.get("name", "")
             chunk_type = payload_data.get("chunk_type", "code")
 
             header = f"File: {path}"
@@ -37,28 +40,8 @@ async def handle_issue(payload):
                 header += f" | {chunk_type}: {name}"
 
             related_code += f"\n-- {header} ---\n{content}\n"
-            seen_paths.add(path)
+            seen_chunks.add(chunk_id)
 
-    if description:
-        desc_embeddings = await embeddings.create_embedding(description[:4000])
-        desc_results = await vectordb.search(
-            desc_embeddings, limit=5, repo=repo_full_name
-        )
-
-        for point in desc_results:
-            payload_data = point.payload
-            path = payload_data.get("path", "")
-            if path and path not in seen_paths:
-                content = payload_data.get("content", "")
-                name = payload_data.get("name", "")
-                chunk_type = payload_data.get("chunk_type", "code")
-
-                header = f"File: {path}"
-                if name:
-                    header += f" | {chunk_type}: {name}"
-
-                related_code += f"\n-- {header} ---\n{content}\n"
-                seen_paths.add(path)
     custom_rules = await fetch_custom_rules(installation_id)
 
     comment = await llm.help_with_issue(

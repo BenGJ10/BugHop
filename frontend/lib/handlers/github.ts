@@ -27,7 +27,7 @@ export async function handleInstallationCreated(payload: any) {
 
       for (const repo of repositories) {
         await upsertRepository(
-          repo.id,
+          BigInt(repo.id),
           repo.name,
           repo.full_name,
           exsistingInstallation.id,
@@ -55,15 +55,15 @@ export async function handlePullRequestOpened(payload: any) {
     });
 
     const repository = await upsertRepository(
-      repo.id,
+      BigInt(repo.id),
       repo.name,
       repo.full_name,
-      installation.id,
+      installation!.id,
     );
 
     await prisma.pullRequest.create({
       data: {
-        githubId: pr.id,
+        githubId: BigInt(pr.id),
         number: pr.number,
         title: pr.title,
         repositoryId: repository.id,
@@ -76,7 +76,7 @@ export async function handlePullRequestOpened(payload: any) {
     if (isAutoPR) {
       const updatesUser = await prisma.user.update({
         where: {
-          id: installation.id,
+          id: installation!.userId,
         },
         data: {
           prsCreated: {
