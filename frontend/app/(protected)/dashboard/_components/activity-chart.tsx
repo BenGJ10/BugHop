@@ -25,8 +25,8 @@ import {
 } from "@/components/ui/select";
 
 const chartConfig = {
-  pullRequests: { label: "Pull Request", color: "#127A4D" },
-  issues: { label: "Issues", color: "#0d5636" },
+  pullRequests: { label: "Pull Request", color: "#f5efe7" },
+  issues: { label: "Issues", color: "#9a8f86" },
 } satisfies ChartConfig;
 
 interface ActivityChartProps {
@@ -41,17 +41,17 @@ export function ActivityChart({
   onTimeRangeChange,
 }: ActivityChartProps) {
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between border-b pb-4">
+    <Card className="app-card">
+      <CardHeader className="flex flex-row items-center justify-between border-b border-white/[0.08] pb-4">
         <div>
-          <CardTitle>Activity Overview</CardTitle>
-          <CardDescription>PRs and Issues analyzed over time</CardDescription>
+          <CardTitle className="text-white">Activity Overview</CardTitle>
+          <CardDescription className="text-[#b49a8e]">PRs and Issues analyzed over time</CardDescription>
         </div>
         <Select value={timeRange} onValueChange={onTimeRangeChange}>
-          <SelectTrigger className="w-40">
+          <SelectTrigger className="w-40 bg-[#120b0b] border-white/[0.08] text-[#e7d6cb]">
             <SelectValue />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-[#120b0b] border-white/[0.08]">
             <SelectItem value="90d">Last 3 months</SelectItem>
             <SelectItem value="30d">Last 30 days</SelectItem>
             <SelectItem value="7d">Last 7 days</SelectItem>
@@ -63,20 +63,21 @@ export function ActivityChart({
           <AreaChart data={chartData}>
             <defs>
               <linearGradient id="fillPRs" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#127A4D" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="#127A4D" stopOpacity={0.1} />
+                <stop offset="5%" stopColor="#f5efe7" stopOpacity={0.35} />
+                <stop offset="95%" stopColor="#f5efe7" stopOpacity={0.02} />
               </linearGradient>
               <linearGradient id="fillIssues" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#0d5636" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="#0d5636" stopOpacity={0.1} />
+                <stop offset="5%" stopColor="#9a8f86" stopOpacity={0.35} />
+                <stop offset="95%" stopColor="#9a8f86" stopOpacity={0.02} />
               </linearGradient>
             </defs>
-            <CartesianGrid vertical={false} />
+            <CartesianGrid vertical={false} stroke="#241414" />
             <XAxis
               dataKey="date"
               tickLine={false}
               axisLine={false}
               tickMargin={8}
+              tick={{ fill: "#a28d83", fontSize: 12 }}
               tickFormatter={(value) =>
                 new Date(value).toLocaleDateString("en-US", {
                   month: "short",
@@ -87,16 +88,16 @@ export function ActivityChart({
             <ChartTooltip content={<ChartTooltipContent indicator="dot" />} />
             <Area
               dataKey="issues"
-              type="natural"
+              type="monotone"
               fill="url(#fillIssues)"
-              stroke="#0d5636"
+              stroke="#9a8f86"
               stackId="a"
             />
             <Area
               dataKey="pullRequests"
-              type="natural"
+              type="monotone"
               fill="url(#fillPRs)"
-              stroke="#127A4D"
+              stroke="#f5efe7"
               stackId="a"
             />
             <ChartLegend content={<ChartLegendContent />} />

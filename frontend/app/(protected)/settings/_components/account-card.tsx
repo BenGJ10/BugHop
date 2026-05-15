@@ -15,21 +15,21 @@ interface AccountCardProps {
 
 export function AccountCard({ email, userId }: AccountCardProps) {
   return (
-    <Card className="mb-6">
+    <Card className="app-card mb-6">
       <CardHeader>
-        <CardTitle>Account</CardTitle>
-        <CardDescription>Your account information</CardDescription>
+        <CardTitle className="text-white">Account</CardTitle>
+        <CardDescription className="text-[#b49a8e]">Your account information</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           <div>
-            <label className="text-sm text-muted-foreground">Email</label>
-            <p className="font-medium">{email}</p>
+            <label className="text-xs text-[#a28d83]">Email</label>
+            <p className="font-medium text-[#f5efe7] text-sm">{email}</p>
           </div>
 
           <div>
-            <label className="text-sm text-muted-foreground">User ID</label>
-            <p className="font-mono text-sm">{userId}</p>
+            <label className="text-xs text-[#a28d83]">User ID</label>
+            <p className="font-mono text-sm text-[#d6c2b8]">{userId}</p>
           </div>
         </div>
       </CardContent>

@@ -56,37 +56,37 @@ export function LogFilters({
   onClearFilters,
 }: LogFiltersProps) {
   return (
-    <Card className="mb-6">
+    <Card className="app-card mb-6">
       <CardHeader>
-        <CardTitle className="text-lg">Filters</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-lg text-white">Filters</CardTitle>
+        <CardDescription className="text-[#b49a8e]">
           Filter logs by type, repository or date range
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="flex flex-wrap gap-4 items-end">
           <div>
-            <label className="text-sm font-medium block mb-2">Type</label>
+            <label className="text-sm font-medium block mb-2 text-[#d6c2b8]">Type</label>
             <Tabs
               value={typeFilter}
               onValueChange={(v) =>
                 onTypeFilterChange(v as "all" | "pr" | "issue")
               }
             >
-              <TabsList>
-                <TabsTrigger value="all">All</TabsTrigger>
-                <TabsTrigger value="pr">Pull Requests</TabsTrigger>
-                <TabsTrigger value="issue">Issues</TabsTrigger>
+              <TabsList className="bg-[#120b0b] border border-white/[0.08]">
+                <TabsTrigger value="all" className="data-[state=active]:bg-[#f5efe7]/10 data-[state=active]:text-[#f5efe7] text-[#b49a8e]">All</TabsTrigger>
+                <TabsTrigger value="pr" className="data-[state=active]:bg-[#f5efe7]/10 data-[state=active]:text-[#f5efe7] text-[#b49a8e]">Pull Requests</TabsTrigger>
+                <TabsTrigger value="issue" className="data-[state=active]:bg-[#f5efe7]/10 data-[state=active]:text-[#f5efe7] text-[#b49a8e]">Issues</TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
           <div>
-            <label className="text-sm font-medium block mb-2">Repository</label>
+            <label className="text-sm font-medium block mb-2 text-[#d6c2b8]">Repository</label>
             <Select value={repoFilter} onValueChange={onRepoFilterChange}>
-              <SelectTrigger className="w-50">
+              <SelectTrigger className="w-50 bg-[#120b0b] border-white/[0.08] text-[#f5efe7]">
                 <SelectValue placeholder="All Repositories" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-[#120b0b] border-white/[0.08]">
                 <SelectItem value="all">All Repositories</SelectItem>
                 {repositories.map((repo) => (
                   <SelectItem key={repo.id} value={repo.id}>
@@ -98,18 +98,18 @@ export function LogFilters({
           </div>
 
           <div>
-            <label className="text-sm font-medium block mb-2">Start Date</label>
+            <label className="text-sm font-medium block mb-2 text-[#d6c2b8]">Start Date</label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-37.5 justify-start text-left font-normal"
+                  className="w-37.5 justify-start text-left font-normal bg-[#120b0b] border-white/[0.08] text-[#f5efe7] hover:bg-[#1b1111]"
                 >
                   <CalendarIcon className="w-4 h-4 mr-2" />
                   {startDate ? format(startDate, "MMM d, yyyy") : "Pick Date"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
+              <PopoverContent className="w-auto p-0 bg-[#120b0b] border-white/[0.08]" align="start">
                 <Calendar
                   mode="single"
                   selected={startDate}
@@ -121,18 +121,18 @@ export function LogFilters({
           </div>
 
           <div>
-            <label className="text-sm font-medium block mb-2">End Date</label>
+            <label className="text-sm font-medium block mb-2 text-[#d6c2b8]">End Date</label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-37.5 justify-start text-left font-normal"
+                  className="w-37.5 justify-start text-left font-normal bg-[#120b0b] border-white/[0.08] text-[#f5efe7] hover:bg-[#1b1111]"
                 >
                   <CalendarIcon className="w-4 h-4 mr-2" />
                   {endDate ? format(endDate, "MMM d, yyyy") : "Pick Date"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
+              <PopoverContent className="w-auto p-0 bg-[#120b0b] border-white/[0.08]" align="start">
                 <Calendar
                   mode="single"
                   selected={endDate}
@@ -143,7 +143,7 @@ export function LogFilters({
             </Popover>
           </div>
 
-          <Button variant="ghost" onClick={onClearFilters}>
+          <Button variant="ghost" onClick={onClearFilters} className="text-[#b49a8e] hover:text-white hover:bg-[#1b1111] cursor-pointer">
             Clear Filters
           </Button>
         </div>

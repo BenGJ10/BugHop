@@ -71,6 +71,7 @@ export async function getFilteredLogs(userId: string, filters: LogFilters) {
 
   // Step 5: Fetch PRs and issues, then combine them into one list
   const logs: LogEntry[] = [];
+  const seenKeys = new Set<string>();
 
   // Fetch PRs (skip if user only wants issues)
   if (filters.type !== "issue") {
@@ -86,14 +87,18 @@ export async function getFilteredLogs(userId: string, filters: LogFilters) {
     });
 
     for (const pr of prs) {
-      logs.push({
-        id: pr.id,
-        type: "pr",
-        number: pr.number,
-        title: pr.title,
-        repository: pr.repository.fullName,
-        date: pr.reviewedAt,
-      });
+      const key = `pr-${pr.repository.fullName}-${pr.number}`;
+      if (!seenKeys.has(key)) {
+        seenKeys.add(key);
+        logs.push({
+          id: pr.id,
+          type: "pr",
+          number: pr.number,
+          title: pr.title,
+          repository: pr.repository.fullName,
+          date: pr.reviewedAt,
+        });
+      }
     }
   }
 
@@ -111,14 +116,18 @@ export async function getFilteredLogs(userId: string, filters: LogFilters) {
     });
 
     for (const issue of issues) {
-      logs.push({
-        id: issue.id,
-        type: "issue",
-        number: issue.number,
-        title: issue.title,
-        repository: issue.repository.fullName,
-        date: issue.analyzedAt,
-      });
+      const key = `issue-${issue.repository.fullName}-${issue.number}`;
+      if (!seenKeys.has(key)) {
+        seenKeys.add(key);
+        logs.push({
+          id: issue.id,
+          type: "issue",
+          number: issue.number,
+          title: issue.title,
+          repository: issue.repository.fullName,
+          date: issue.analyzedAt,
+        });
+      }
     }
   }
 
@@ -155,8 +164,8 @@ export async function getDashboardStats(userId: string) {
 
   if (!user) return null;
 
-  const installation = user.installations[0];
-  const repositories = installation?.repositories || [];
+  const repositories = user.installations.flatMap(inst => inst.repositories) || [];
+  const installation = user.installations[0]; // fallback, but repositories is what matters
 
   let totalPRs = 0;
   let totalIssues = 0;

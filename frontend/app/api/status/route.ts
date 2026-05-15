@@ -11,17 +11,23 @@ export async function GET() {
 
       if (feedResponse.ok) {
         const feed = await feedResponse.json();
-        const mappedStatus =
-          feed.status === "operational"
+        
+        // Remove razorpay from consideration
+        const filteredServices = { ...(feed.services || {}) };
+        delete filteredServices["razorpay"];
+
+        const totalServices = Object.keys(filteredServices).length;
+        const operationalServices = Object.values(filteredServices).filter(
+          (service: any) => service?.status === "operational",
+        ).length;
+        
+        const mappedStatus = 
+          totalServices > 0 && operationalServices === totalServices
             ? "online"
-            : feed.status === "degraded"
+            : operationalServices > 0
               ? "degraded"
               : "offline";
 
-        const totalServices = Object.keys(feed.services || {}).length;
-        const operationalServices = Object.values(feed.services || {}).filter(
-          (service: any) => service?.status === "operational",
-        ).length;
         const uptime =
           totalServices > 0
             ? Math.round((operationalServices / totalServices) * 10000) / 100
@@ -30,7 +36,7 @@ export async function GET() {
         return NextResponse.json({
           status: mappedStatus,
           uptime,
-          services: feed.services || {},
+          services: filteredServices,
           source: "backend-status-feed",
         });
       }

@@ -23,6 +23,7 @@ interface UsageData {
   chatMessagesUsed: number;
   billingCycleStart: string;
   githubAccount: string | null;
+  repoName: string | null;
   limits: {
     FREE: UsageLimits;
     PRO: UsageLimits;
@@ -62,6 +63,11 @@ export function UsageProvider({ children }: { children: ReactNode }) {
       if (!res.ok) throw new Error("Failed to fetch usage");
       const data = await res.json();
 
+      const repoName =
+        data.stats?.repoName && data.stats.repoName !== "No repository connected"
+          ? data.stats.repoName
+          : null;
+
       setUsage({
         plan: data.user.plan,
         prsUsed: data.user.prsUsed,
@@ -70,6 +76,7 @@ export function UsageProvider({ children }: { children: ReactNode }) {
         chatMessagesUsed: data.user.chatMessagesUsed,
         billingCycleStart: data.user.billingCycleStart,
         githubAccount: data.stats?.githubAccount || null,
+        repoName,
         limits: data.limits,
       });
       setError(null);

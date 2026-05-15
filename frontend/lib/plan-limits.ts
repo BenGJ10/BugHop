@@ -1,9 +1,14 @@
-export const PLAN_LIMITS = {
+export type PlanType = "FREE" | "PRO";
+
+export const PLAN_LIMITS: Record<
+  PlanType,
+  { prs: number; prsCreated: number; issues: number; chat: number }
+> = {
   FREE: {
-    prs: 20,
-    prsCreated: 10,
-    issues: 40,
-    chat: 100,
+    prs: 50,
+    prsCreated: 15,
+    issues: 50,
+    chat: 200,
   },
   PRO: {
     prs: 150,

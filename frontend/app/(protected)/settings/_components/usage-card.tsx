@@ -32,15 +32,15 @@ function Progressbar({
 }) {
   return (
     <div>
-      <div className="flex justify-between mb-1">
-        <span className="text-sm">{label}</span>
-        <span className="text-sm text-muted-foreground">
+      <div className="flex justify-between mb-1.5">
+        <span className="text-sm text-[#f5efe7]">{label}</span>
+        <span className="text-sm text-[#a28d83]">
           {used}/{limit}
         </span>
       </div>
-      <div className="w-full bg-muted rounded-full h-2">
+      <div className="w-full bg-[#1b1111] rounded-full h-1.5 overflow-hidden">
         <div
-          className="bg-[#127A4D] h-2 rounded-fu;;"
+          className="bg-[#f5efe7] h-1.5 rounded-full transition-all duration-700"
           style={{
             width: `${(used / (limit || 1)) * 100}%`,
           }}
@@ -58,10 +58,10 @@ export function UsageCard({
   limits,
 }: UsageCardProps) {
   return (
-    <Card>
+    <Card className="app-card mb-6">
       <CardHeader>
-        <CardTitle>Usage this month</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-white">Usage this month</CardTitle>
+        <CardDescription className="text-[#b49a8e]">
           Your usage resets months from the signup date
         </CardDescription>
       </CardHeader>

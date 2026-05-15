@@ -34,10 +34,10 @@ export function RuleForm({
   error,
 }: RuleFormProps) {
   return (
-    <Card className="mb-6">
+    <Card className="app-card mb-6">
       <CardHeader>
-        <CardTitle>Add New Rule</CardTitle>
-        <CardDescription>Write your rule in natural language.</CardDescription>
+        <CardTitle className="text-white">Add New Rule</CardTitle>
+        <CardDescription className="text-[#b49a8e]">Write your rule in natural language.</CardDescription>
       </CardHeader>
 
       <CardContent>
@@ -45,24 +45,25 @@ export function RuleForm({
           <Input
             value={newRule}
             onChange={(e) => onNewRuleChange(e.target.value)}
-            placeholder="Use #127A4D for green styling"
+            placeholder="e.g. Always use TypeScript strict mode"
             disabled={creating || !canAddMore}
+            className="bg-[#120b0b] border-white/[0.08] text-[#f5efe7] placeholder:text-[#8d7468] focus:border-white/[0.3]"
           />
           {error && <p className="text-red-500 text-sm">{error}</p>}
           <div className="flex items-center justify-between">
-            <span className="text-sm items-center justify-between">
+            <span className="text-sm text-[#b49a8e]">
               {rulesCount}/{maxRules} used
               {isFree && rulesCount >= 5 && (
-                <span className="ml-2 text-[#127A4D]">
+                <span className="ml-2 text-[#f5efe7]">
                   Upgrade to Pro for more rules
                 </span>
               )}
             </span>
 
             <Button
-              variant="default"
               type="submit"
               disabled={creating || !canAddMore}
+              className="bg-[#f5efe7] hover:bg-[#e7d6cb] text-[#0a0707] cursor-pointer"
             >
               {creating ? "Adding..." : "Add Rule"}
             </Button>

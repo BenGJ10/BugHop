@@ -5,7 +5,6 @@ import { useUser } from "@clerk/nextjs";
 import { useUsage } from "@/components/providers/usage-provider";
 import { useAuthRedirect } from "@/hooks/use-auth-redirect";
 import { AccountCard } from "./_components/account-card";
-import { SubscriptionCard } from "./_components/subscription-card";
 import { UsageCard } from "./_components/usage-card";
 import { GithubCard } from "./_components/github-card";
 import { SystemStatusCard } from "./_components/system-status-card";
@@ -74,7 +73,7 @@ export default function SettingsPage() {
           handleIndexingStatus(status);
         }
       } catch (error) {
-        console.error("error fetchiug repo:", error);
+        console.error("error fetchig repo:", error);
       }
     };
 
@@ -112,14 +111,6 @@ export default function SettingsPage() {
     fetchStatus();
   }, []);
 
-  const handleUpgrade = () => {
-    window.location.href = "/api/polar/checkout";
-  };
-
-  const handleManageSubscription = () => {
-    window.location.href = "/api/polar/portal";
-  };
-
   if (!isLoaded || usageLoading) {
     return <SettingsLoading />;
   }
@@ -132,22 +123,22 @@ export default function SettingsPage() {
       {toast && (
         <div className="fixed right-4 top-4 z-50">
           <div
-            className={`rounded-lg border px-4 py-3 text-sm shadow-lg ${
-              toast.tone === "success"
-                ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+            className={`rounded-xl border px-4 py-3 text-sm shadow-2xl backdrop-blur-sm ${toast.tone === "success"
+                ? "border-white/[0.16] bg-white/5 text-[#f5efe7]"
                 : toast.tone === "error"
-                  ? "border-red-200 bg-red-50 text-red-800"
-                  : "border-slate-200 bg-white text-slate-700"
-            }`}
+                  ? "border-red-500/30 bg-red-500/10 text-red-400"
+                  : "border-white/[0.08] bg-[#120b0b] text-[#e7d6cb]"
+              }`}
           >
             {toast.message}
           </div>
         </div>
       )}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold">Settings</h1>
-        <p className="text-muted-foreground">
-          Manage your account and subscriptio bro
+      <div className="app-header">
+        <div className="app-kicker">Control Center</div>
+        <h1 className="app-title text-white mt-3">Settings</h1>
+        <p className="app-subtitle mt-1">
+          Manage your account, usage, and integration health.
         </p>
       </div>
 
@@ -156,23 +147,17 @@ export default function SettingsPage() {
         userId={user?.id}
       />
 
-      <SubscriptionCard
-        isPro={isPro}
-        onUpgrade={handleUpgrade}
-        onManageSubscription={handleManageSubscription}
-        loading={loading}
-      />
-
       <UsageCard
-        prsUsed={usage?.prsUsed ||0}
-        prsCreated={usage?.prsCreated ||0}
-        issuesUsed={usage?.issuesUsed ||0}
-        chatMessagesUsed={usage?.chatMessagesUsed ||0}
+        prsUsed={usage?.prsUsed || 0}
+        prsCreated={usage?.prsCreated || 0}
+        issuesUsed={usage?.issuesUsed || 0}
+        chatMessagesUsed={usage?.chatMessagesUsed || 0}
         limits={{
-          prs: usage?.limits[currentPlan].prs ||0,
-            prsCreated:usage?.limits[currentPlan].prsCreated ||0,
-              issues: usage?.limits[currentPlan].issues ||0,
-        chat: usage?.limits[currentPlan].chat ||0}
+          prs: usage?.limits[currentPlan].prs || 0,
+          prsCreated: usage?.limits[currentPlan].prsCreated || 0,
+          issues: usage?.limits[currentPlan].issues || 0,
+          chat: usage?.limits[currentPlan].chat || 0
+        }
         }
       />
 

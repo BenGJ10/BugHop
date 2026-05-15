@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useUsage } from "@/components/providers/usage-provider";
 import { StatCard } from "./_components/stat-card";
 import { ActivityChart } from "./_components/activity-chart";
+import { RoiCards } from "./_components/roi-cards";
 import DashboardLoading from "./loading";
 import { useAuthRedirect } from "@/hooks/use-auth-redirect";
 
@@ -25,7 +26,7 @@ interface DashboardData {
 
   chartData: {
     date: string;
-    pullRequest: number;
+    pullRequests: number;
     issues: number;
   }[];
 
@@ -77,30 +78,30 @@ export default function DashboardPage() {
   if (!data) {
     return (
       <div className="max-w-4xl mx-auto">
-        <div className="border border-dashed rounded-xl p-8 bg-muted/30">
-          <h2 className="text-xl font-semibold mb-2">No activity yet</h2>
-          <p className="text-muted-foreground mb-6">
-            Connect a GitHub repo and run your first review to populate your
-            dashboard.
+        <div className="border border-white/[0.12] border-dashed rounded-2xl p-8 bg-[#0f0909]">
+          <div className="app-kicker">Getting Started</div>
+          <h2 className="text-xl font-semibold mb-2 text-white mt-3">No review activity yet</h2>
+          <p className="app-subtitle mb-6">
+            Connect a GitHub repo and let BugHop run its first review to activate your analytics.
           </p>
 
           <div className="grid gap-4 sm:grid-cols-3">
-            <div className="rounded-lg border bg-background p-4">
-              <p className="text-sm font-medium mb-1">1. Connect GitHub</p>
-              <p className="text-xs text-muted-foreground">
-                Install the app and select a repository.
+            <div className="rounded-xl border border-white/[0.08] bg-[#0f0909] p-4">
+              <p className="text-sm font-medium mb-1 text-white">1. Connect GitHub</p>
+              <p className="text-xs text-[#b49a8e]">
+                Install the BugHop app and pick a repo.
               </p>
             </div>
-            <div className="rounded-lg border bg-background p-4">
-              <p className="text-sm font-medium mb-1">2. Start indexing</p>
-              <p className="text-xs text-muted-foreground">
-                Let BugHop learn your codebase structure.
+            <div className="rounded-xl border border-white/[0.08] bg-[#0f0909] p-4">
+              <p className="text-sm font-medium mb-1 text-white">2. Start indexing</p>
+              <p className="text-xs text-[#b49a8e]">
+                BugHop builds context across your services.
               </p>
             </div>
-            <div className="rounded-lg border bg-background p-4">
-              <p className="text-sm font-medium mb-1">3. Run a review</p>
-              <p className="text-xs text-muted-foreground">
-                Open a PR or issue and trigger analysis.
+            <div className="rounded-xl border border-white/[0.08] bg-[#0f0909] p-4">
+              <p className="text-sm font-medium mb-1 text-white">3. Run a review</p>
+              <p className="text-xs text-[#b49a8e]">
+                Open a PR or issue to see findings.
               </p>
             </div>
           </div>
@@ -108,9 +109,9 @@ export default function DashboardPage() {
           <div className="mt-6">
             <a
               href="/settings"
-              className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+              className="inline-flex items-center justify-center rounded-xl bg-[#f5efe7] px-5 py-2.5 text-sm font-medium text-[#0a0707] hover:bg-[#e7d6cb] transition-colors"
             >
-              Go to Settings
+              Configure BugHop
             </a>
           </div>
         </div>
@@ -127,18 +128,25 @@ export default function DashboardPage() {
     return date >= startDate;
   });
 
+  const normalizedChartData = filteredChartData.map((item) => ({
+    ...item,
+    pullRequests: Math.max(0, item.pullRequests || 0),
+    issues: Math.max(0, item.issues || 0),
+  }));
+
   const limits = data.limits[data.user.plan];
 
   return (
     <div className="max-w-6xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground">
-          Overview of your code review activity
+      <div className="app-header">
+        <div className="app-kicker">BugHop Insights</div>
+        <h1 className="app-title text-white mt-3">Dashboard</h1>
+        <p className="app-subtitle mt-1">
+          Real-time visibility into automated reviews, quality, and velocity.
         </p>
       </div>
 
-      <div className="grid grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
         <StatCard
           label="PRs Reviewed This Month"
           used={data.user.prsUsed}
@@ -146,27 +154,31 @@ export default function DashboardPage() {
           percentage={getUsagePercentage("prs")}
         />
         <StatCard
-          label="PRs created this month"
+          label="PRs Created This Month"
           used={data.user.prsCreated}
           limit={limits.prsCreated}
           percentage={getUsagePercentage("prsCreated")}
         />
         <StatCard
-          label="issues analyzed this month"
+          label="Issues Analyzed"
           used={data.user.issuesUsed}
           limit={limits.issues}
           percentage={getUsagePercentage("issues")}
         />
         <StatCard
-          label="chat messages this month"
+          label="Chat Messages"
           used={data.user.chatMessagesUsed}
           limit={limits.chat}
           percentage={getUsagePercentage("chat")}
         />
+        <RoiCards
+          totalPRs={data.user.prsUsed + data.user.prsCreated}
+          totalIssues={data.user.issuesUsed}
+        />
       </div>
 
       <ActivityChart
-        chartData={filteredChartData}
+        chartData={normalizedChartData}
         timeRange={timeRange}
         onTimeRangeChange={setTimeRange}
       />

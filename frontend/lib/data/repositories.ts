@@ -22,8 +22,7 @@ export async function upsertRepository(
   installationId: string,
 ) {
   try {
-    
-    return prisma.repository.upsert({
+    const repo = await prisma.repository.upsert({
       where: {
         githubId,
       },
@@ -39,8 +38,9 @@ export async function upsertRepository(
       },
     });
     console.log("repository upserted in db successfully")
+    return repo;
   } catch (error) {
-    console.log({error})
+    console.log("Error in upsertRepository:", {error})
   }
 }
 

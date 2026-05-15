@@ -19,11 +19,11 @@ export default function ErrorPage({
 
   return (
     <div className="flex flex-col items-center justify-center h-[50vh] gap-4">
-      <h2 className="text-xl font-semibold">something went wrong. lmao</h2>
-      <p className="text-muted-foreground">
-        some unexpected error occured. try again bro
+      <h2 className="text-xl font-semibold text-white">Something went wrong</h2>
+      <p className="text-[#666] text-sm">
+        An unexpected error occurred. Please try again.
       </p>
-      <Button onClick={reset} variant="outline">
+      <Button onClick={reset} className="border-white/[0.06] text-[#ccc] hover:bg-white/[0.04] bg-transparent border cursor-pointer">
         Try Again
       </Button>
     </div>

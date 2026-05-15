@@ -10,7 +10,7 @@ import type { Repository } from "./_components/log-filters";
 export default function LogsPage() {
   const { isSignedIn, isLoaded } = useAuthRedirect();
   const [logs, setLogs] = useState<LogEntry[]>([]);
-  const [repositories, setRepositories] = useState<Respository[]>([]);
+  const [repositories, setRepositories] = useState<Repository[]>([]);
   const [initialLoading, setInitialLoading] = useState(true);
   const [filtering, setFiltering] = useState(false);
   const [typeFilter, setTypeFilter] = useState<"all" | "pr" | "issue">("all");
@@ -72,10 +72,11 @@ export default function LogsPage() {
 
   return (
     <div className="max-w-7xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold">Activity Logs</h1>
-        <p className="text-muted-foreground">
-          View all PR reviews and issue analyzes perfrormed by the bot
+      <div className="app-header">
+        <div className="app-kicker">Audit Trail</div>
+        <h1 className="app-title text-white mt-3">Activity Logs</h1>
+        <p className="app-subtitle mt-1">
+          Every PR review and issue analysis BugHop has delivered.
         </p>
       </div>
 

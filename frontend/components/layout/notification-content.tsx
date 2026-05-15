@@ -130,9 +130,8 @@ export function NotificationContent() {
 
           const notificationElement = (
             <div
-              className={`flex items-start gap-3 px-3 py-2.5 border-b border-border/50 last:border-0 ${
-                isUnread ? "bg-muted/30" : ""
-              }
+              className={`flex items-start gap-3 px-3 py-2.5 border-b border-border/50 last:border-0 ${isUnread ? "bg-muted/30" : ""
+                }
                 ${content.url ? "hover:bg-muted/50 cursor-pointer" : ""}`}
             >
               <div

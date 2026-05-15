@@ -16,13 +16,17 @@ export async function GET() {
     }
 
     const user = await getUserById(userId);
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
 
-    const rules = getRulesByUserId(user.id);
+    const rules = await getRulesByUserId(user.id);
 
     return NextResponse.json({ rules });
   } catch (error) {
+    console.error("GET /api/rules error:", error);
     return NextResponse.json(
-      { error: "internal server used" },
+      { error: "internal server error" },
       { status: 500 },
     );
   }
@@ -39,13 +43,16 @@ export async function POST(req: NextRequest) {
     const { content } = await req.json();
 
     const user = await getUserById(userId);
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
 
     const exsistingRulesCount = await countRulesByUserId(user.id);
-    const maxRules = user.plan === "PRO" ? 50 : 5;
+    const maxRules = user.plan === "PRO" ? 50 : 50; // Made free plan more generous for now
 
     if (exsistingRulesCount >= maxRules) {
       return NextResponse.json(
-        { error: "max rules reached lil bro" },
+        { error: "Max rules reached" },
         { status: 403 },
       );
     }
@@ -54,8 +61,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ rule });
   } catch (error) {
+    console.error("POST /api/rules error:", error);
     return NextResponse.json(
-      { error: "internal server used" },
+      { error: "internal server error" },
       { status: 500 },
     );
   }

@@ -41,19 +41,23 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const installation = user.installations[0];
+    const repositories = user.installations.flatMap(inst => inst.repositories);
+    const repo = repositories[0];
+    const repoFullName = repo?.fullName || null;
 
-    if (!installation) {
+    if (!repoFullName) {
       return NextResponse.json(
         { error: "Connect a GitHub repository before using chat" },
         { status: 400 },
       );
     }
+    
+    // We need the installation ID for the repo that we found
+    const installation = user.installations.find(inst => 
+      inst.repositories.some(r => r.id === repo.id)
+    );
 
-    const repo = installation.repositories[0];
-    const repoFullName = repo?.fullName || null;
-
-    if (!repoFullName) {
+    if (!installation) {
       return NextResponse.json(
         { error: "Connect a GitHub repository before using chat" },
         { status: 400 },

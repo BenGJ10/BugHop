@@ -5,6 +5,7 @@ import { useAuthRedirect } from "@/hooks/use-auth-redirect";
 import { useUsage } from "@/components/providers/usage-provider";
 import { RuleForm } from "./_components/rule-form";
 import { RuleList } from "./_components/rule-list";
+import { RuleStarterPacks, TONE_PREFIXES } from "./_components/rule-starter-packs";
 import type { Rule } from "./_components/rule-list";
 
 export default function RulesPage() {
@@ -17,6 +18,7 @@ export default function RulesPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [tone, setTone] = useState("mentor");
 
   useEffect(() => {
     if (isSignedIn) {
@@ -37,6 +39,11 @@ export default function RulesPage() {
     }
   };
 
+  // Append starter pack rules to the input textarea
+  const handleAppendRules = (packRules: string) => {
+    setNewRule((prev) => (prev ? `${prev}\n\n${packRules}` : packRules));
+  };
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newRule.trim()) {
@@ -46,13 +53,17 @@ export default function RulesPage() {
     setCreating(true);
     setError(null);
 
+    // Silently prepend the tone prefix
+    const tonePrefix = TONE_PREFIXES[tone] ? `[AI Tone] ${TONE_PREFIXES[tone]}\n\n` : "";
+    const contentToSave = `${tonePrefix}${newRule.trim()}`;
+
     try {
       const res = await fetch("/api/rules", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ content: newRule }),
+        body: JSON.stringify({ content: contentToSave }),
       });
 
       const data = await res.json();
@@ -92,7 +103,7 @@ export default function RulesPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("are you sure you wanna to delete this rule?")) return;
+    if (!confirm("Are you sure you want to delete this rule?")) return;
 
     try {
       const res = await fetch(`/api/rules/${id}`, {
@@ -126,13 +137,20 @@ export default function RulesPage() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold">Custom Rules</h1>
-        <p className="text-muted-foreground">
-          Define rules in plain enlish. the ai will use these rules when
-          reviewing your shit
+      <div className="app-header">
+        <div className="app-kicker">Review Policy</div>
+        <h1 className="app-title text-white mt-3">Custom Rules</h1>
+        <p className="app-subtitle mt-1">
+          Define how BugHop should review your codebase in plain English.
         </p>
       </div>
+
+      {/* Feature 2 & 3: Starter Packs + Tone Selector */}
+      <RuleStarterPacks
+        onAppendRules={handleAppendRules}
+        tone={tone}
+        onToneChange={setTone}
+      />
 
       <RuleForm
         newRule={newRule}
