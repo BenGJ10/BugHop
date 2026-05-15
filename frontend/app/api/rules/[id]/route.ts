@@ -23,6 +23,7 @@ export async function PUT(
   } catch (error) {
     return NextResponse.json(
       { error: "internal server used" },
-      { status: 500 },
+      { status: 500 }
+    );
   }
 }
