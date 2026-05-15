@@ -696,6 +696,18 @@ html {
   overflow: hidden;
 }
 
+.app-shell,
+.auth-shell {
+  --radius: 0px;
+}
+
+.app-shell [class~="rounded"],
+.app-shell [class*="rounded-"],
+.auth-shell [class~="rounded"],
+.auth-shell [class*="rounded-"] {
+  border-radius: 0 !important;
+}
+
 .app-shell-grid {
   position: absolute;
   inset: 0;
