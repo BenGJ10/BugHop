@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Bug, Crown, LogOut, Github, CreditCard } from "lucide-react";
+import { Bug, Crown, LogOut, Github, CreditCard, Menu, X } from "lucide-react";
 import {
   DashboardIcon,
   ChatIcon,
@@ -13,7 +13,6 @@ import {
 } from "@/components/icons/sidebar-icons";
 import { useUser, useClerk } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useUsage } from "@/components/providers/usage-provider";
 
 const menuItems = [
@@ -32,27 +31,36 @@ export function AppSidebar() {
   const { signOut } = useClerk();
   const { usage, loading: usageLoading } = useUsage();
   const [showSignOut, setShowSignOut] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const isPro = usage?.plan === "PRO";
   const connectionLabel = usage?.githubAccount || usage?.repoName;
 
-  return (
-    <aside className="w-64 h-screen sticky top-0 border-r border-white/[0.08] bg-[#0d0707] flex flex-col">
+  const sidebarContent = (
+    <aside className="w-64 h-full border-r border-white/[0.08] bg-[#0d0707] flex flex-col">
       {/* Logo area */}
       <div className="p-4 border-b border-white/[0.08] flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3 min-w-0">
-          <div className="w-8 h-8 rounded-md border border-white/[0.12] bg-[#120b0b] flex items-center justify-center shrink-0">
-            <Bug className="w-4 h-4 text-[#f5efe7]" />
+          <div className="w-8 h-8 border border-white/[0.12] bg-[#120b0b] flex items-center justify-center shrink-0">
+            <Bug className="w-4 h-4 text-[#ef3a2d]" />
           </div>
           <div className="min-w-0">
             <p className="font-semibold text-white text-sm">BugHop</p>
             <p className="text-xs text-[#a28d83]">Autonomous reviews</p>
           </div>
         </Link>
+        {/* Close button on mobile */}
+        <button
+          onClick={() => setMobileOpen(false)}
+          className="md:hidden text-white/50 hover:text-white transition-colors p-1"
+          aria-label="Close sidebar"
+        >
+          <X className="w-5 h-5" />
+        </button>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-3">
+      <nav className="flex-1 p-3 overflow-y-auto">
         <ul className="space-y-0.5">
           {menuItems.map((item) => {
             const isActive = pathname === item.url;
@@ -60,6 +68,7 @@ export function AppSidebar() {
               <li key={item.title}>
                 <Link
                   href={item.url}
+                  onClick={() => setMobileOpen(false)}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 ${isActive
                       ? "bg-[#f5efe7]/10 text-[#f5efe7] font-medium border border-white/[0.12]"
                       : "text-[#b49a8e] hover:text-white hover:bg-[#1b1111]"
@@ -195,5 +204,40 @@ export function AppSidebar() {
         )}
       </div>
     </aside>
+  );
+
+  return (
+    <>
+      {/* Mobile hamburger toggle button */}
+      <button
+        onClick={() => setMobileOpen(true)}
+        className="md:hidden fixed top-4 left-4 z-50 w-9 h-9 flex items-center justify-center bg-[#0d0707] border border-white/[0.12] rounded-lg text-white/70 hover:text-white transition-colors"
+        aria-label="Open sidebar"
+      >
+        <Menu className="w-5 h-5" />
+      </button>
+
+      {/* Desktop sidebar */}
+      <div className="hidden md:flex h-screen sticky top-0">
+        {sidebarContent}
+      </div>
+
+      {/* Mobile sidebar overlay */}
+      <div 
+        className={`md:hidden fixed inset-0 z-40 flex transition-opacity duration-300 ${mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+      >
+        {/* Backdrop */}
+        <div
+          className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300"
+          onClick={() => setMobileOpen(false)}
+        />
+        {/* Sidebar panel */}
+        <div 
+          className={`relative z-10 h-full flex transition-transform duration-300 ease-in-out ${mobileOpen ? "translate-x-0" : "-translate-x-full"}`}
+        >
+          {sidebarContent}
+        </div>
+      </div>
+    </>
   );
 }

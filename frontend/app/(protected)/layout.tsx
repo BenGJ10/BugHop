@@ -10,7 +10,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <SignedIn>
         <AppSidebar />
       </SignedIn>
-      <main className="app-main flex-1 overflow-y-auto flex flex-col">
+      <main className="app-main flex-1 overflow-y-auto flex flex-col pt-14 md:pt-0">
         <div className="flex-1">
           {children}
         </div>

@@ -54,44 +54,45 @@ export function LogTable({ logs, hasActiveFilters }: LogTableProps) {
             </p>
           </div>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow className="border-white/[0.08] hover:bg-transparent">
-                <TableHead className="text-[#d6c2b8]">Type</TableHead>
-                <TableHead className="text-[#d6c2b8]">Number</TableHead>
-                <TableHead className="text-[#d6c2b8]">Title</TableHead>
-                <TableHead className="text-[#d6c2b8]">Repository</TableHead>
-                <TableHead className="text-[#d6c2b8]">Date</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {logs.map((log) => (
-                <TableRow key={log.id} className="border-white/[0.08] hover:bg-[#1b1111]">
-                  <TableCell>
-                    <span
-                      className={`px-2.5 py-1 rounded-lg text-xs font-medium ${log.type === "pr"
-                          ? "bg-[#f5efe7]/10 text-[#f5efe7]"
-                          : "bg-[#9a8f86]/15 text-[#9a8f86]"
-                        }`}
-                    >
-                      {log.type === "pr" ? "PR" : "Issue"}
-                    </span>
-                  </TableCell>
-                  <TableCell className="font-mono text-[#d6c2b8]">#{log.number}</TableCell>
-                  <TableCell className="max-w-[300px] truncate text-[#f5efe7]">
-                    {log.title}
-                  </TableCell>
-                  <TableCell className="text-[#b49a8e]">
-                    {log.repository}
-                  </TableCell>
-
-                  <TableCell className="text-[#b49a8e]">
-                    {format(new Date(log.date), "MMM d, yyyy h:mm a")}
-                  </TableCell>
+          <div className="overflow-x-auto -mx-6 px-6">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-white/[0.08] hover:bg-transparent">
+                  <TableHead className="text-[#d6c2b8] whitespace-nowrap">Type</TableHead>
+                  <TableHead className="text-[#d6c2b8] whitespace-nowrap">Number</TableHead>
+                  <TableHead className="text-[#d6c2b8] whitespace-nowrap">Title</TableHead>
+                  <TableHead className="text-[#d6c2b8] whitespace-nowrap">Repository</TableHead>
+                  <TableHead className="text-[#d6c2b8] whitespace-nowrap">Date</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {logs.map((log) => (
+                  <TableRow key={log.id} className="border-white/[0.08] hover:bg-[#1b1111]">
+                    <TableCell>
+                      <span
+                        className={`px-2.5 py-1 rounded-lg text-xs font-medium whitespace-nowrap ${log.type === "pr"
+                            ? "bg-[#f5efe7]/10 text-[#f5efe7]"
+                            : "bg-[#9a8f86]/15 text-[#9a8f86]"
+                          }`}
+                      >
+                        {log.type === "pr" ? "PR" : "Issue"}
+                      </span>
+                    </TableCell>
+                    <TableCell className="font-mono text-[#d6c2b8] whitespace-nowrap">#{log.number}</TableCell>
+                    <TableCell className="max-w-[200px] truncate text-[#f5efe7]">
+                      {log.title}
+                    </TableCell>
+                    <TableCell className="text-[#b49a8e] whitespace-nowrap">
+                      {log.repository}
+                    </TableCell>
+                    <TableCell className="text-[#b49a8e] whitespace-nowrap">
+                      {format(new Date(log.date), "MMM d, yyyy h:mm a")}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         )}
       </CardContent>
     </Card>

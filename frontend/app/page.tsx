@@ -1,7 +1,10 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { SignInButton, SignUpButton, useAuth } from "@clerk/nextjs";
 import { AppFooter } from "@/components/layout/app-footer";
+import { Bug } from "lucide-react";
 
 const problemCards = [
   {
@@ -65,6 +68,13 @@ const benefits = [
 
 export default function Home() {
   const { isSignedIn, isLoaded } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+      router.push("/dashboard");
+    }
+  }, [isLoaded, isSignedIn, router]);
 
   if (!isLoaded) {
     return (
@@ -79,28 +89,25 @@ export default function Home() {
       <div className="rig-noise" />
 
       <nav className="rig-nav fixed top-0 left-0 right-0 z-50">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full border border-white/30 flex items-center justify-center text-xs font-semibold">
-              BH
+            <div className="w-9 h-9 border border-white/30 flex items-center justify-center">
+              <Bug className="w-5 h-5 text-[#ef3a2d]" />
             </div>
             <span className="rig-logo rig-mono">BugHop</span>
           </div>
-          <div className="flex items-center gap-5">
-            <a href="#problem" className="text-xs uppercase tracking-[0.25em] text-white/60 hover:text-white transition-colors rig-mono">
-              Blog
-            </a>
+          <div className="flex items-center gap-3 sm:gap-5">
             {isSignedIn ? (
               <a href="/dashboard" className="rig-btn rig-btn-primary">Open Dashboard</a>
             ) : (
               <>
                 <SignInButton>
-                  <button className="text-xs uppercase tracking-[0.25em] text-white/60 hover:text-white transition-colors rig-mono">
+                  <button className="text-xs uppercase tracking-[0.25em] text-white/60 hover:text-white transition-colors rig-mono hidden sm:block">
                     Log in
                   </button>
                 </SignInButton>
                 <SignUpButton>
-                  <button className="rig-btn rig-btn-primary">Get Early Access</button>
+                  <button className="rig-btn rig-btn-primary">Sign Up</button>
                 </SignUpButton>
               </>
             )}
@@ -112,7 +119,7 @@ export default function Home() {
         <section className="rig-hero">
           <div className="rig-hero-grid" />
           <div className="rig-hero-glow" />
-          <div className="max-w-6xl mx-auto px-6 pt-28 pb-24 relative z-10">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-20 sm:pt-28 sm:pb-24 relative z-10">
             <div className="rig-tag rig-mono">Introducing BugHop</div>
             <h1 className="rig-hero-title font-display mt-8">
               Autonomous AI code review.
@@ -135,7 +142,7 @@ export default function Home() {
               ) : (
                 <>
                   <SignUpButton>
-                    <button className="rig-btn rig-btn-primary">Join Waitlist</button>
+                    <button className="rig-btn rig-btn-primary">Get Started</button>
                   </SignUpButton>
                   <a href="#approach" className="rig-btn rig-btn-secondary">
                     Our Approach
@@ -145,7 +152,7 @@ export default function Home() {
             </div>
           </div>
           <div className="rig-divider" />
-          <div className="max-w-6xl mx-auto px-6 py-6">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
             <div className="rig-ticker rig-mono">
               <span>PR Review Agent</span>
               <span>GitHub Native</span>
@@ -158,7 +165,7 @@ export default function Home() {
 
         <section id="problem" className="relative bg-[#0b0808]">
           <div className="rig-grid-lines" />
-          <div className="max-w-6xl mx-auto px-6 py-24 relative z-10 grid lg:grid-cols-[1.1fr_1fr] gap-12">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24 relative z-10 grid lg:grid-cols-[1.1fr_1fr] gap-12">
             <div>
               <div className="rig-tag rig-mono">The Problem</div>
               <h2 className="rig-section-title font-display mt-6">
@@ -215,7 +222,7 @@ export default function Home() {
         </section>
 
         <section id="approach" className="bg-[#0b0808]">
-          <div className="max-w-5xl mx-auto px-6 py-24 text-center">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16 sm:py-24 text-center">
             <div className="rig-tag rig-mono">Introducing BugHop</div>
             <h2 className="rig-section-title font-display mt-6">
               BugHop lives in your workflow.
@@ -242,7 +249,7 @@ export default function Home() {
         </section>
 
         <section className="bg-[#0a0707]">
-          <div className="max-w-6xl mx-auto px-6 py-24 grid lg:grid-cols-[1fr_1.1fr] gap-12 items-center">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24 grid lg:grid-cols-[1fr_1.1fr] gap-12 items-center">
             <div className="rig-orbit">
               <span className="rig-orbit-ring" />
               <span className="rig-orbit-ring ring-2" />
@@ -260,7 +267,7 @@ export default function Home() {
         </section>
 
         <section className="bg-[#0a0707] pb-24">
-          <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-3 gap-5">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 grid md:grid-cols-3 gap-5">
             {benefits.map((item) => (
               <div key={item.label} className="rig-benefit">
                 <div className="rig-card-meta">{item.label}</div>
@@ -273,19 +280,19 @@ export default function Home() {
 
         <section className="rig-cta">
           <div className="rig-wireframe" />
-          <div className="max-w-5xl mx-auto px-6 py-24 text-center relative z-10">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16 sm:py-24 text-center relative z-10">
             <h2 className="rig-cta-title font-display">Break free from slow reviews</h2>
             <div className="mt-10">
               {isSignedIn ? (
                 <a href="/dashboard" className="rig-btn rig-btn-cta">Open Dashboard -&gt;</a>
               ) : (
                 <SignUpButton>
-                  <button className="rig-btn rig-btn-cta">Request Early Access -&gt;</button>
+                  <button className="rig-btn rig-btn-cta">Get Started -&gt;</button>
                 </SignUpButton>
               )}
             </div>
             <p className="mt-5 text-xs uppercase tracking-[0.3em] text-white/40 rig-mono">
-              {isSignedIn ? "Live now in your workspace." : "No credit card. Early access only."}
+              {isSignedIn ? "Live now in your workspace." : "Autonomous code review for your team."}
             </p>
           </div>
         </section>

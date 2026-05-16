@@ -42,7 +42,7 @@ export function ActivityChart({
 }: ActivityChartProps) {
   return (
     <Card className="app-card">
-      <CardHeader className="flex flex-row items-center justify-between border-b border-white/[0.08] pb-4">
+      <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-white/[0.08] pb-4">
         <div>
           <CardTitle className="text-white">Activity Overview</CardTitle>
           <CardDescription className="text-[#b49a8e]">PRs and Issues analyzed over time</CardDescription>

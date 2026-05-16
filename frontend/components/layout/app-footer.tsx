@@ -7,7 +7,7 @@ export function AppFooter() {
       <div className="max-w-6xl mx-auto px-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-8">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-md border border-white/[0.12] bg-[#120b0b] flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 border border-white/[0.12] bg-[#120b0b] flex items-center justify-center shrink-0">
               <Bug className="w-4 h-4 text-[#ef3a2d]" />
             </div>
             <div>
@@ -17,11 +17,10 @@ export function AppFooter() {
           </div>
           
           <div className="flex flex-wrap gap-6 text-sm text-[#b49a8e]">
-            <Link href="#" className="hover:text-[#ef3a2d] transition-colors">Documentation</Link>
-            <Link href="#" className="hover:text-[#ef3a2d] transition-colors">Twitter</Link>
-            <Link href="#" className="hover:text-[#ef3a2d] transition-colors">GitHub</Link>
-            <Link href="#" className="hover:text-[#ef3a2d] transition-colors">Terms</Link>
-            <Link href="#" className="hover:text-[#ef3a2d] transition-colors">Privacy</Link>
+            <a href="https://x.com/marcus_313131" target="_blank" rel="noopener noreferrer" className="hover:text-[#ef3a2d] transition-colors">Twitter</a>
+            <a href="https://github.com/anshdeshwal31/BugHop" target="_blank" rel="noopener noreferrer" className="hover:text-[#ef3a2d] transition-colors">GitHub</a>
+            <a href="https://www.linkedin.com/in/anshdeshwal31" target="_blank" rel="noopener noreferrer" className="hover:text-[#ef3a2d] transition-colors">LinkedIn</a>
+            <a href="tel:9627660757" className="hover:text-[#ef3a2d] transition-colors">Contact The Developer: 9627660757</a>
           </div>
         </div>
         

@@ -5,6 +5,7 @@ import { useUsage } from "@/components/providers/usage-provider";
 import { StatCard } from "./_components/stat-card";
 import { ActivityChart } from "./_components/activity-chart";
 import { RoiCards } from "./_components/roi-cards";
+import { Bug } from "lucide-react";
 import DashboardLoading from "./loading";
 import { useAuthRedirect } from "@/hooks/use-auth-redirect";
 
@@ -22,6 +23,7 @@ interface DashboardData {
     totalIssues: number;
     repoCount: number;
     repoName: string;
+    githubAccount: string | null;
   };
 
   chartData: {
@@ -145,6 +147,32 @@ export default function DashboardPage() {
           Real-time visibility into automated reviews, quality, and velocity.
         </p>
       </div>
+      
+      {!data.stats.githubAccount && (
+        <div className="mb-8 p-6 rounded-2xl border border-[#ef3a2d]/30 bg-[#ef3a2d]/5 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
+            <Bug className="w-32 h-32 text-[#ef3a2d] rotate-12" />
+          </div>
+          <div className="relative z-10">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-2 h-2 rounded-full bg-[#ef3a2d] animate-pulse" />
+              <span className="text-xs font-bold uppercase tracking-widest text-[#ef3a2d] rig-mono">Action Required</span>
+            </div>
+            <h2 className="text-xl font-bold text-white mb-2">Install BugHop GitHub App</h2>
+            <p className="text-[#b49a8e] mb-5 max-w-xl">
+              To start autonomous code reviews and see real-time insights, you need to install our GitHub app and grant access to your repositories.
+            </p>
+            <a 
+              href={`https://github.com/apps/${process.env.NEXT_PUBLIC_GITHUB_APP_NAME}/installations/new`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center rounded-xl bg-[#ef3a2d] px-6 py-3 text-sm font-bold text-white hover:bg-[#d63328] transition-all shadow-lg shadow-[#ef3a2d]/20 hover:scale-[1.02] active:scale-[0.98]"
+            >
+              Configure GitHub Access
+            </a>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
         <StatCard

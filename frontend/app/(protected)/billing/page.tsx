@@ -3,17 +3,13 @@
 import { useUsage } from "@/components/providers/usage-provider";
 import { useAuthRedirect } from "@/hooks/use-auth-redirect";
 import { SubscriptionCard } from "./_components/subscription-card";
-
+import BillingLoading from "./loading";
 export default function BillingPage() {
   const { isLoaded, isSignedIn } = useAuthRedirect();
   const { usage, loading: usageLoading } = useUsage();
 
   if (!isLoaded || usageLoading) {
-    return (
-      <div className="max-w-4xl mx-auto flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#f5efe7]"></div>
-      </div>
-    );
+    return <BillingLoading />;
   }
 
   if (!isSignedIn) {

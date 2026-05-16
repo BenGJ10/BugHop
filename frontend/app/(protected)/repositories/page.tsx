@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { CheckCircle, XCircle, Loader2, Github } from "lucide-react";
 import Link from "next/link";
+import RepositoriesLoading from "./loading";
 
 const SCANNING_STEPS = [
   "Cloning repository...",
@@ -66,11 +67,7 @@ export default function RepositoriesPage() {
   }, [repositories]);
 
   if (!isLoaded || loading) {
-    return (
-      <div className="max-w-5xl mx-auto flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#f5efe7]"></div>
-      </div>
-    );
+    return <RepositoriesLoading />;
   }
 
   const renderStatus = (status: Repository["indexingStatus"]) => {
@@ -111,7 +108,7 @@ export default function RepositoriesPage() {
 
   return (
     <div className="max-w-5xl mx-auto">
-      <div className="app-header flex items-center justify-between">
+      <div className="app-header flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="app-kicker">Codebase Access</div>
           <h1 className="app-title text-white mt-3">Repositories</h1>
@@ -119,7 +116,7 @@ export default function RepositoriesPage() {
             Connect repos, track indexing, and keep BugHop in sync.
           </p>
         </div>
-        <Button className="bg-[#f5efe7] hover:bg-[#e7d6cb] text-[#0a0707] cursor-pointer" asChild>
+        <Button className="bg-[#f5efe7] hover:bg-[#e7d6cb] text-[#0a0707] cursor-pointer self-start sm:self-auto" asChild>
           <a
             href={`https://github.com/apps/${process.env.NEXT_PUBLIC_GITHUB_APP_NAME}`}
             target="_blank"

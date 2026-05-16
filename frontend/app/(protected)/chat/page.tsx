@@ -111,7 +111,7 @@ export default function ChatPage() {
   const canChat = canSendMessage();
 
   return (
-    <div className="flex flex-col h-[calc(100vh-48px)]">
+    <div className="flex flex-col h-[calc(100vh-56px)] md:h-[calc(100vh-48px)]">
       <div className="app-header max-w-3xl mx-auto px-4 pt-2">
         <div className="app-kicker">Codebase Chat</div>
         <h1 className="app-title text-white mt-3">BugHop Chat</h1>
