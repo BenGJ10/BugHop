@@ -92,12 +92,12 @@ export default function Home() {
               <a href="/dashboard" className="rig-btn rig-btn-primary">Open Dashboard</a>
             ) : (
               <>
-                <SignInButton>
+                <SignInButton forceRedirectUrl="/dashboard">
                   <button className="text-xs uppercase tracking-[0.25em] text-white/60 hover:text-white transition-colors rig-mono hidden sm:block">
                     Log in
                   </button>
                 </SignInButton>
-                <SignUpButton>
+                <SignUpButton forceRedirectUrl="/dashboard">
                   <button className="rig-btn rig-btn-primary">Sign Up</button>
                 </SignUpButton>
               </>
@@ -132,7 +132,7 @@ export default function Home() {
                 </>
               ) : (
                 <>
-                  <SignUpButton>
+                  <SignUpButton forceRedirectUrl="/dashboard">
                     <button className="rig-btn rig-btn-primary">Get Started</button>
                   </SignUpButton>
                   <a href="#approach" className="rig-btn rig-btn-secondary">
@@ -278,7 +278,7 @@ export default function Home() {
               {isSignedIn ? (
                 <a href="/dashboard" className="rig-btn rig-btn-cta">Open Dashboard -&gt;</a>
               ) : (
-                <SignUpButton>
+                <SignUpButton forceRedirectUrl="/dashboard">
                   <button className="rig-btn rig-btn-cta">Get Started -&gt;</button>
                 </SignUpButton>
               )}
