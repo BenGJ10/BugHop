@@ -21,15 +21,6 @@ async def get_installation_token(installation_id):
         "POST", f"/app/installations/{installation_id}/access_tokens", jwt_token
     )
 
-    if resp.status_code >= 400:
-        try:
-            detail = resp.json()
-        except Exception:
-            detail = resp.text
-        raise RuntimeError(
-            f"Failed to create installation token ({resp.status_code}): {detail}"
-        )
-
     data = resp.json()
     token = data.get("token")
     if not token:

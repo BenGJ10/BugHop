@@ -1,5 +1,4 @@
 import asyncio
-import hashlib
 import uuid
 
 import inngest
@@ -13,20 +12,25 @@ from app.services.frontend import update_indexing_status
 
 def make_chunk_id(repo_full_name: str, file_path: str, start_line: int, end_line: int) -> str:
     source = f"{repo_full_name}:{file_path}:{start_line}:{end_line}"
-    # Deterministic UUID so Qdrant accepts the ID format.
     return str(uuid.uuid5(uuid.NAMESPACE_URL, source))
 
 
 async def _embed_batch(repo_full_name, chunks):
     texts = [create_chunk_text_for_embedding(chunk) for chunk in chunks]
     vectors = await embeddings.create_embeddings(texts)
-    points = []
 
+    # Fix #5: validate vector count matches chunk count before zip
+    if len(vectors) != len(chunks):
+        raise ValueError(
+            f"Embedding count mismatch for {repo_full_name}: "
+            f"expected {len(chunks)}, got {len(vectors)}"
+        )
+
+    points = []
     for chunk, vector in zip(chunks, vectors):
         chunk_id = make_chunk_id(
             repo_full_name, chunk.file_path, chunk.start_line, chunk.end_line
         )
-
         points.append(
             vectordb.create_point(
                 id=chunk_id,
@@ -43,7 +47,6 @@ async def _embed_batch(repo_full_name, chunks):
                 },
             )
         )
-
     return points
 
 
@@ -51,7 +54,7 @@ async def _embed_batch(repo_full_name, chunks):
     fn_id="handle_installation",
     trigger=inngest.TriggerEvent(event="installation/created"),
 )
-async def handle_installation(ctx: inngest.Context):
+async def handle_installation(ctx: inngest.Context) -> dict:
     installation_id = ctx.event.data["installation_id"]
     account = ctx.event.data["account"]
     repo_name = ctx.event.data["repo_name"]
@@ -68,13 +71,17 @@ async def handle_installation(ctx: inngest.Context):
     except Exception as exc:
         print(f"Failed to fetch repo metadata: {exc}")
 
-    await update_indexing_status(
-        repo_full_name,
-        "INDEXING",
-        installation_id=installation_id,
-        repo_github_id=repo_github_id,
-        repo_name=repo_display_name,
-    )
+    # Fix #1: wrap so a bad frontend response can't kill the entire indexing job
+    try:
+        await update_indexing_status(
+            repo_full_name,
+            "INDEXING",
+            installation_id=installation_id,
+            repo_github_id=repo_github_id,
+            repo_name=repo_display_name,
+        )
+    except Exception as exc:
+        print(f"update_indexing_status(INDEXING) failed (non-fatal): {exc}")
 
     files = github.iter_repo_files(account, repo_name, token)
 
@@ -102,25 +109,34 @@ async def handle_installation(ctx: inngest.Context):
 
             tasks.append(asyncio.create_task(run()))
 
+        # Fix #4: isolate per-file failures — one bad file won't crash the whole job
         for task in asyncio.as_completed(tasks):
-            points = await task
-            pending_points.extend(points)
-            if len(pending_points) >= settings.qdrant_upsert_batch_size:
-                vectordb.upsert_embeddings(pending_points)
-                points_upserted += len(pending_points)
-                pending_points.clear()
+            try:
+                points = await task
+                pending_points.extend(points)
+                if len(pending_points) >= settings.qdrant_upsert_batch_size:
+                    # Fix #7: upsert_embeddings is now async (uses asyncio.to_thread internally)
+                    await vectordb.upsert_embeddings(pending_points)
+                    points_upserted += len(pending_points)
+                    pending_points.clear()
+            except Exception as exc:
+                print(f"Embedding batch failed for {file_path}, skipping: {exc}")
 
     if pending_points:
-        vectordb.upsert_embeddings(pending_points)
+        await vectordb.upsert_embeddings(pending_points)
         points_upserted += len(pending_points)
 
-    await update_indexing_status(
-        repo_full_name,
-        "COMPLETED",
-        installation_id=installation_id,
-        repo_github_id=repo_github_id,
-        repo_name=repo_display_name,
-    )
+    # Fix #1: same guard on the final status update
+    try:
+        await update_indexing_status(
+            repo_full_name,
+            "COMPLETED",
+            installation_id=installation_id,
+            repo_github_id=repo_github_id,
+            repo_name=repo_display_name,
+        )
+    except Exception as exc:
+        print(f"update_indexing_status(COMPLETED) failed (non-fatal): {exc}")
 
     return {
         "status": "completed",

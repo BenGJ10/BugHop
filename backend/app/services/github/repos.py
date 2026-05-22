@@ -126,13 +126,25 @@ async def iter_repo_files(owner, repo, token):
                         headers=headers,
                         timeout=settings.github_timeout_seconds,
                     )
-                    resp.raise_for_status()
-                    return resp
                 except (httpx.TimeoutException, httpx.ConnectError):
                     if attempt == 3:
                         print(f"GitHub request timed out after retries: {url}")
                         return None
                     await asyncio.sleep(0.6 * attempt)
+                    continue
+
+                # Fix #6: retry retriable server errors; skip non-retriable client errors
+                if resp.status_code in {429, 500, 502, 503, 504}:
+                    if attempt < 3:
+                        await asyncio.sleep(0.6 * attempt)
+                        continue
+                    print(f"GitHub returned {resp.status_code} after retries: {url}")
+                    return None
+                if resp.status_code >= 400:
+                    print(f"GitHub returned {resp.status_code} (non-retriable): {url}")
+                    return None
+                return resp
+            return None
 
         async def fetch_directory(path=""):
             nonlocal files_seen
@@ -156,7 +168,13 @@ async def iter_repo_files(owner, repo, token):
                         continue
                     file_data = file_resp.json()
 
-                    content = base64.b64decode(file_data["content"]).decode("utf-8")
+                    # Fix #2: skip binary or non-UTF8 files instead of crashing
+                    try:
+                        content = base64.b64decode(file_data["content"]).decode("utf-8")
+                    except (UnicodeDecodeError, Exception):
+                        print(f"Skipping non-UTF8 file: {item['path']}")
+                        continue
+
                     files_seen += 1
                     yield {"path": item["path"], "content": content}
 

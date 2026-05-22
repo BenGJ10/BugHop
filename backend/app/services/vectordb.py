@@ -1,4 +1,4 @@
-from urllib.parse import urlparse, urlunparse
+import asyncio
 
 from qdrant_client import QdrantClient
 from qdrant_client.models import (
@@ -10,8 +10,10 @@ from qdrant_client.models import (
     PointStruct,
     VectorParams,
 )
+from urllib.parse import urlparse, urlunparse
 
 from app.core.config import settings
+
 
 def _normalize_qdrant_url(raw_url: str) -> str:
     if not raw_url:
@@ -60,14 +62,16 @@ def init_collection():
         print(f"Qdrant create_payload_index failed: {exc}")
 
 
-def upsert_embeddings(points):
+# Fix #7: async so the sync Qdrant client doesn't block the event loop
+async def upsert_embeddings(points):
     if not points:
         return
 
     batch_size = max(1, settings.qdrant_upsert_batch_size)
     for i in range(0, len(points), batch_size):
         batch = points[i : i + batch_size]
-        client.upsert(
+        await asyncio.to_thread(
+            client.upsert,
             collection_name=COLLECTION_NAME,
             points=batch,
             timeout=settings.qdrant_timeout_seconds,
@@ -75,7 +79,6 @@ def upsert_embeddings(points):
 
 
 async def search(embedding, repo, limit=5):
-
     query_filter = None
     if repo:
         query_filter = Filter(
