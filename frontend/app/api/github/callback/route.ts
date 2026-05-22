@@ -63,15 +63,38 @@ export async function GET(req: NextRequest) {
 
       if (reposRes.ok) {
         const reposData = await reposRes.json();
+        const activeGithubIds = [];
+
         for (const repo of reposData.repos ?? []) {
-          await upsertRepository(
+          const r = await upsertRepository(
             BigInt(repo.id),
             repo.name,
             repo.full_name,
             installation.id,
           );
+          if (r) {
+            activeGithubIds.push(r.githubId);
+          }
         }
-        console.log("repositories upserted in db successfully");
+
+        // Delete any repositories (and their cascade data) that the user
+        // has removed access to from this installation.
+        if (activeGithubIds.length > 0) {
+          await prisma.repository.deleteMany({
+            where: {
+              installationId: installation.id,
+              githubId: { notIn: activeGithubIds },
+            },
+          });
+        } else {
+          await prisma.repository.deleteMany({
+            where: {
+              installationId: installation.id,
+            },
+          });
+        }
+
+        console.log("repositories synced in db successfully");
       } else {
         console.log({ reposRes });
         console.log("didn't get the expected response from github");
