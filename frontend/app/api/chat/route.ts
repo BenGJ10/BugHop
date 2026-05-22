@@ -14,7 +14,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { question } = await req.json();
+    // repoFullName is null → search all repos; a string → search specific repo
+    const { question, repoFullName } = await req.json();
     if (!question) {
       return NextResponse.json(
         { error: "question is required" },
@@ -41,28 +42,31 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const repositories = user.installations.flatMap(inst => inst.repositories);
-    const repo = repositories[0];
-    const repoFullName = repo?.fullName || null;
+    const allRepos = user.installations.flatMap((inst) => inst.repositories);
 
-    if (!repoFullName) {
+    if (allRepos.length === 0) {
       return NextResponse.json(
         { error: "Connect a GitHub repository before using chat" },
         { status: 400 },
       );
     }
-    
-    // We need the installation ID for the repo that we found
-    const installation = user.installations.find(inst => 
-      inst.repositories.some(r => r.id === repo.id)
-    );
 
-    if (!installation) {
-      return NextResponse.json(
-        { error: "Connect a GitHub repository before using chat" },
-        { status: 400 },
-      );
+    // Validate that the requested repo actually belongs to this user
+    let resolvedRepo: string | null = null;
+    if (repoFullName) {
+      const owned = allRepos.find((r) => r.fullName === repoFullName);
+      if (!owned) {
+        return NextResponse.json(
+          { error: "Repository not found in your installations" },
+          { status: 403 },
+        );
+      }
+      resolvedRepo = owned.fullName;
     }
+    // resolvedRepo === null means "search all repos" — backend handles this correctly
+
+    // Pick any installation (needed for potential auth, though chat doesn't strictly require it)
+    const installation = user.installations[0];
 
     const backendUrl = process.env.BACKEND_URL;
     const res = await fetch(`${backendUrl}/chat`, {
@@ -73,7 +77,7 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         installationId: String(installation.installationId),
         question,
-        repo: repoFullName,
+        repo: resolvedRepo, // null → backend skips the repo filter
       }),
     });
 
@@ -84,7 +88,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ answer: data.answer });
   } catch (error) {
     return NextResponse.json(
-      { error: "internal server used" },
+      { error: "internal server error" },
       { status: 500 },
     );
   }
